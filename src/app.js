@@ -1,8 +1,15 @@
 import * as _ from 'partial-js';
+import { BehaviorSubject } from 'rxjs';
 
-window._debug ;
+window._debug;
+
+const addedTodoThing = new BehaviorSubject;
+
+window._debug = addedTodoThing;
+
 $on(document, 'DOMContentLoaded', () => {
-  console.log('dom loaded')
+  console.log('dom loaded');
+  init();
   $on(qs('.new-todo'), 'keyup', (e) => {
     if(e.which == 13)
       _.go(
@@ -12,6 +19,25 @@ $on(document, 'DOMContentLoaded', () => {
       );
   });
 })
+
+// uuid 따로 안쓰고 날짜로 단순하게
+function genId() {
+  return (new Date).toISOString().slice(0,23).replace(/-|:|\./g,"");
+}
+
+function init() {
+  addedTodoThing.next([]);
+}
+
+
+/**
+* TODO: subject에 값을 추가하는 함수
+*
+*
+*/
+function pushSubjectValues(id, thingBody) {
+}
+
 
 function curry(fn) {
   return (...xs) => {
@@ -93,7 +119,6 @@ const appendElement = curry((attr, tag, el) => {
   return el;
 })
 
-window._debug = appendElement;
 const makeItem = (val) => {
   return _.go(
     document.createElement.call(document, 'li'),
@@ -103,15 +128,15 @@ const makeItem = (val) => {
   )
 }
 
-window._debug = curry;
-
 function appendList(el) {
   qs('.todo-list').append(el);
+  return el;
 }
 
 const addItem =  _.pipe(
     // txt => element
     makeItem,
     // append element to dom
-    appendList
+    appendList,
+
   )
