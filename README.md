@@ -1,3 +1,27 @@
+# 함수형 프로그래밍 연습용 TodoList 만들기
+
+## SPEC
+
+**함수형프로그래밍을 하고, 더불어 반응형 프로그래밍**
+
+* partial-js
+* rxjs
+
+
+## FLOW
+
+* init: function = 초기화, 로컬에 저장 된 데이터도 가져와서 항시 유지되거나, 초기화 시켜주는 함수
+* addedTodoThing: BehaviorSubject = 추가 된 모든 데이터를 기록, 모든 todoThing은 여기로 업데이트 되도록 한다.
+
+
+**현재생각** init -> addedTodoThing (이부분에서 갈래로 퍼져나가서 상태관리를 하도록)
+
+
+
+
+* 이하 todo mvc의 README
+-----------
+
 # Vanilla ES6 (ES2015) • [TodoMVC](http://todomvc.com)
 
 > A port of the [Vanilla JS Example](http://todomvc.com/examples/vanillajs/), but translated into ES6, also known as ES2015.
