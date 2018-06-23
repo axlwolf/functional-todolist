@@ -5,28 +5,56 @@ window._debug;
 
 const addedTodoThing = new BehaviorSubject;
 
-window._debug = addedTodoThing;
+window._debug = curry;
+window._ = _;
 
 $on(document, 'DOMContentLoaded', () => {
   console.log('dom loaded');
   init();
+  addedTodoThing.subscribe((arr) => {
+      _.each(arr, _.pipe(
+        curry_get('thingBody'),
+        addItem
+      ))
+    }
+  );
+
   $on(qs('.new-todo'), 'keyup', (e) => {
-    if(e.which == 13)
-      _.go(
-        e.target,
-        inputClear,
-        addItem,
-      );
+    console.log(`entered ${e.which}`);
+    if(e.which == 13 && checkBlank(e.target.value)) {
+      listClear(qs('.todo-list'));
+      pushSubjectValues(genId(), e.target.value);
+      inputClear(e.target);
+    }
   });
 })
+
+function checkBlank(str) {
+  return str.length > 0;
+}
+
+function listClear(el) {
+  console.log('caall listClear', Array.from(el.children));
+  _.each(Array.from(el.children), el.removeChild.bind(el));
+}
+
+const curry_get = curry(_get);
+
+function _get(key, list) {
+  return (list[key])? list[key] : undefined;
+}
 
 // uuid 따로 안쓰고 날짜로 단순하게
 function genId() {
   return (new Date).toISOString().slice(0,23).replace(/-|:|\./g,"");
 }
 
+function loadSavedData() {
+  return [];
+}
+
 function init() {
-  addedTodoThing.next([]);
+  addedTodoThing.next(loadSavedData());
 }
 
 
@@ -36,6 +64,9 @@ function init() {
 *
 */
 function pushSubjectValues(id, thingBody) {
+  let val = addedTodoThing.getValue();
+  val.push({id, thingBody})
+  addedTodoThing.next(val);
 }
 
 
@@ -134,9 +165,8 @@ function appendList(el) {
 }
 
 const addItem =  _.pipe(
-    // txt => element
-    makeItem,
-    // append element to dom
-    appendList,
-
-  )
+  // txt => element
+  makeItem,
+  // append element to dom
+  appendList
+)
