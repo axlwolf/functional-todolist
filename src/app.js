@@ -14,14 +14,15 @@ $on(document, 'DOMContentLoaded', () => {
   console.log('dom loaded');
   init();
   addedTodoThing.subscribe((arr) => {
-      _.each(arr, addItem)
+    todoListClaer();
+    _.each(arr, addItem);
     }
   );
 
   $on(qs('.new-todo'), 'keyup', (e) => {
     console.log(`entered ${e.which}`);
     if(e.which == 13 && checkBlank(e.target.value)) {
-      listClear(qs('.todo-list'));
+      listFilter();
       pushSubjectValues(genId(), e.target.value);
       inputClear(e.target);
     }
@@ -33,7 +34,8 @@ $on(document, 'DOMContentLoaded', () => {
     'click',
     () => {
       console.log('clicked clearcomplited');
-      listClear(qs('.todo-list'))
+      todoListClaer();
+      listFilter(()=>false);
     }
   );
 })
@@ -42,12 +44,20 @@ function checkBlank(str) {
   return str.length > 0;
 }
 
-function listClear(el, iter=(()=>true)) {
-  console.log('caall listClear', Array.from(el.children));
-  _.go(
+function todoListClaer() {
+  let el = qs('.todo-list');
+  _.each(
     Array.from(el.children),
+    el.removeChild.bind(el)
+  )
+}
+
+function listFilter(iter=(()=>true)) {
+  _.go(
+    addedTodoThing.getValue(),
     _.filter(iter),
-    _.each(el.removeChild.bind(el))
+    (e)=> {console.log(e); return e;},
+    addedTodoThing.next.bind(addedTodoThing)
   )
 }
 
@@ -189,12 +199,27 @@ function appendClass(el, val) {
   el.classList.add(val);
   return el;
 }
-const curryedAppendClass = curryr(appendClass);
-console.log(curryedAppendClass);
+
+function appendClass(el, val) {
+  console.log('called appendClass', el);
+  if (!val) return el;
+  el.classList.add(val);
+  return el;
+}
+
+function appendAttr(el, key, val) {
+  if (!key || !val) return el;
+  el.setAttribute(key, val);
+  return el;
+}
+
+const curryr_appendAttr = curryr(appendAttr);
+const curryr_AppendClass = curryr(appendClass);
 const makeItem = ({ id, thingBody }) => {
   return _.go(
     document.createElement.call(document, 'li'),
-    curryedAppendClass(id),
+    curryr_appendAttr(id, 'id'),
+    curryr_appendAttr('false', 'complete'),
     appendElement({class: 'toggle', type: 'checkbox'}, 'input'),
     appendElement({txt: thingBody}, 'label'),
     appendElement({class: "destroy"}, 'button')
