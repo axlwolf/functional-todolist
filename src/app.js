@@ -7,15 +7,14 @@ const addedTodoThing = new BehaviorSubject;
 
 window._debug = curry;
 window._ = _;
+window.$delegate = $delegate;
+window.curryr= curryr;
 
 $on(document, 'DOMContentLoaded', () => {
   console.log('dom loaded');
   init();
   addedTodoThing.subscribe((arr) => {
-      _.each(arr, _.pipe(
-        curry_get('thingBody'),
-        addItem
-      ))
+      _.each(arr, addItem)
     }
   );
 
@@ -27,6 +26,16 @@ $on(document, 'DOMContentLoaded', () => {
       inputClear(e.target);
     }
   });
+
+  $delegate(
+    document,
+    '.clear-completed',
+    'click',
+    () => {
+      console.log('clicked clearcomplited');
+      listClear(qs('.todo-list'))
+    }
+  );
 })
 
 function checkBlank(str) {
@@ -79,6 +88,19 @@ function curry(fn) {
       return fn(...xs);
     }
     return curry(fn.bind(null, ...xs));
+  };
+}
+
+function curryr(fn, ...args) {
+  return (...xs) => {
+    if (xs.length === 0) {
+      throw Error('EMPTY INVOCATION');
+    }
+    if (xs.length + args.length >= fn.length) {
+      let params = [...args, ...xs];
+      return fn(...params.reverse());
+    }
+    return curryr(fn, ...args, ...xs);
   };
 }
 
@@ -150,11 +172,27 @@ const appendElement = curry((attr, tag, el) => {
   return el;
 })
 
-const makeItem = (val) => {
+
+/**
+ * Attach a classes to the element
+ *
+ * @param {Element} elk Element which  will be added
+ * @param {string} args calss list
+ */
+function appendClass(el, val) {
+  console.log('called appendClass', el);
+  if (!!val) return el;
+  el.classList.add(val);
+  return el;
+}
+const curryedAppendClass = curryr(appendClass);
+console.log(curryedAppendClass);
+const makeItem = ({ id, thingBody }) => {
   return _.go(
     document.createElement.call(document, 'li'),
+    curryedAppendClass(id),
     appendElement({class: 'toggle', type: 'checkbox'}, 'input'),
-    appendElement({txt: val}, 'label'),
+    appendElement({txt: thingBody}, 'label'),
     appendElement({class: "destroy"}, 'button')
   )
 }
