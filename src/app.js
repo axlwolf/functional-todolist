@@ -42,9 +42,13 @@ function checkBlank(str) {
   return str.length > 0;
 }
 
-function listClear(el) {
+function listClear(el, iter=(()=>true)) {
   console.log('caall listClear', Array.from(el.children));
-  _.each(Array.from(el.children), el.removeChild.bind(el));
+  _.go(
+    Array.from(el.children),
+    _.filter(iter),
+    _.each(el.removeChild.bind(el))
+  )
 }
 
 const curry_get = curry(_get);
