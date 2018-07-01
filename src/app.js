@@ -4,7 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 window._debug;
 
 const addedTodoThing = new BehaviorSubject;
-
+window.addedTodoThing = addedTodoThing;
 window._debug = curry;
 window._ = _;
 window.$delegate = $delegate;
@@ -15,7 +15,7 @@ $on(document, 'DOMContentLoaded', () => {
   init();
   addedTodoThing.subscribe((arr) => {
     todoListClaer();
-    _.each(arr, addItem);
+    _.each(arr, (item) => {item.el = addItem(item)});
     }
   );
 
@@ -33,9 +33,21 @@ $on(document, 'DOMContentLoaded', () => {
     '.clear-completed',
     'click',
     () => {
-      console.log('clicked clearcomplited');
       todoListClaer();
-      listFilter(()=>false);
+      listFilter((item) => !item.el.children[0].checked);
+    }
+  );
+
+  $delegate(
+    document,
+    '.destroy',
+    'click',
+    (e) => {
+      let stream = addedTodoThing.getValue();
+      let id = e.target.parentElement.getAttribute('id');
+      let idx =_.findIndex(stream, (item) => item.id===id);
+      stream[idx].el.remove();
+      _.removeByIndex(stream, idx);
     }
   );
 })
@@ -56,7 +68,6 @@ function listFilter(iter=(()=>true)) {
   _.go(
     addedTodoThing.getValue(),
     _.filter(iter),
-    (e)=> {console.log(e); return e;},
     addedTodoThing.next.bind(addedTodoThing)
   )
 }
@@ -186,7 +197,6 @@ const appendElement = curry((attr, tag, el) => {
   return el;
 })
 
-
 /**
  * Attach a classes to the element
  *
@@ -219,7 +229,6 @@ const makeItem = ({ id, thingBody }) => {
   return _.go(
     document.createElement.call(document, 'li'),
     curryr_appendAttr(id, 'id'),
-    curryr_appendAttr('false', 'complete'),
     appendElement({class: 'toggle', type: 'checkbox'}, 'input'),
     appendElement({txt: thingBody}, 'label'),
     appendElement({class: "destroy"}, 'button')
