@@ -15,13 +15,12 @@ $on(document, 'DOMContentLoaded', () => {
   init();
   addedTodoThing.subscribe((arr) => {
     todoListClaer();
-    _.each(arr, (item) => {item.el = addItem(item)});
+      _.each(arr, (item) => {item.el = addItem(item)});
     }
   );
 
   $on(qs('.new-todo'), 'keyup', (e) => {
-    console.log(`entered ${e.which}`);
-    if(e.which == 13 && checkBlank(e.target.value)) {
+    if (e.which == 13 && checkBlank(e.target.value)) {
       listFilter();
       pushSubjectValues(genId(), e.target.value);
       inputClear(e.target);
@@ -43,14 +42,31 @@ $on(document, 'DOMContentLoaded', () => {
     '.destroy',
     'click',
     (e) => {
-      let stream = addedTodoThing.getValue();
+      const stream = addedTodoThing.getValue();
       let id = e.target.parentElement.getAttribute('id');
       let idx =_.findIndex(stream, (item) => item.id===id);
-      stream[idx].el.remove();
-      _.removeByIndex(stream, idx);
+      removeTodoByIdx(stream, idx);
     }
   );
-})
+
+  $delegate(
+    document,
+    '.clear-completed',
+    'click',
+    e => {
+      const stream = addedTodoThing.getValue();
+      _.each(stream, item => {
+        item.el.remove();
+      });
+      addedTodoThing.next([]);
+    }
+  );
+});
+
+function removeTodoByIdx(todoList, idx) {
+  todoList[idx].el.remove();
+  _.removeByIndex(todoList, idx);
+}
 
 function checkBlank(str) {
   return str.length > 0;
@@ -91,7 +107,6 @@ function init() {
   addedTodoThing.next(loadSavedData());
 }
 
-
 /**
 * TODO: subject에 값을 추가하는 함수
 *
@@ -102,7 +117,6 @@ function pushSubjectValues(id, thingBody) {
   val.push({id, thingBody})
   addedTodoThing.next(val);
 }
-
 
 function curry(fn) {
   return (...xs) => {
