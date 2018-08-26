@@ -12,7 +12,7 @@ window.$delegate = $delegate;
 window.curryr= curryr;
 
 $on(document, 'DOMContentLoaded', () => {
-  console.log('dom loaded');
+
   init();
   addedTodoThing.subscribe(arr => {
     todoListClaer();
@@ -72,6 +72,10 @@ function checkBlank(str) {
   return str.length > 0;
 }
 
+/**
+ *
+ * 돔에서 리스트를 제거하는 함수
+ */
 function todoListClaer() {
   let el = qs('.todo-list');
   _.each(
@@ -217,14 +221,14 @@ const appendElement = curry((attr, tag, el) => {
  * @param {string} args calss list
  */
 function appendClass(el, val) {
-  console.log('called appendClass', el);
+
   if (!!val) return el;
   el.classList.add(val);
   return el;
 }
 
 function appendClass(el, val) {
-  console.log('called appendClass', el);
+
   if (!val) return el;
   el.classList.add(val);
   return el;
@@ -251,6 +255,12 @@ const makeItem = ({ id, thingBody }) => {
 function appendList(el) {
   qs('.todo-list').append(el);
   return el;
+}
+
+function renderList(list) {
+  _.each(list, item => {
+    appendList(item.el);
+  });
 }
 
 const addItem =  _.pipe(
