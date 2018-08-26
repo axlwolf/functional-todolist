@@ -13,9 +13,8 @@ window.curryr= curryr;
 
 $on(document, 'DOMContentLoaded', () => {
   console.log('dom loaded');
-
   init();
-  addedTodoThing.subscribe((arr) => {
+  addedTodoThing.subscribe(arr => {
     todoListClaer();
       _.each(arr, (item) => {item.el = addItem(item)});
     }
@@ -23,7 +22,7 @@ $on(document, 'DOMContentLoaded', () => {
 
   $on(qs('.new-todo'), 'keyup', (e) => {
     if (e.which == 13 && checkBlank(e.target.value)) {
-      listFilter();
+      addedTodoThing.next(listFilter());
       pushSubjectValues(genId(), e.target.value);
       inputClear(e.target);
     }
@@ -50,6 +49,18 @@ $on(document, 'DOMContentLoaded', () => {
       removeTodoByIdx(stream, idx);
     }
   );
+  window.addEventListener("hashchange", () => {
+    const hash = location.hash.replace("#/", "");
+    switch(hash) {
+      case "active":
+      break;
+      case "completed":
+      break;
+      default:
+        addedTodoThing.next(addedTodoThing.getValue());
+      break;
+    }
+  }, false);
 });
 
 function removeTodoByIdx(todoList, idx) {
@@ -70,11 +81,10 @@ function todoListClaer() {
 }
 
 function listFilter(iter=(()=>true)) {
-  _.go(
+  return _.go(
     addedTodoThing.getValue(),
     _.filter(iter),
-    addedTodoThing.next.bind(addedTodoThing)
-  )
+  );
 }
 
 const curry_get = curry(_get);
