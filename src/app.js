@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 window._debug;
 
 const addedTodoThing = new BehaviorSubject;
+const INITIAL_STATE = () => [];
 window.addedTodoThing = addedTodoThing;
 window._debug = curry;
 window._ = _;
@@ -12,6 +13,7 @@ window.curryr= curryr;
 
 $on(document, 'DOMContentLoaded', () => {
   console.log('dom loaded');
+
   init();
   addedTodoThing.subscribe((arr) => {
     todoListClaer();
@@ -33,7 +35,7 @@ $on(document, 'DOMContentLoaded', () => {
     'click',
     () => {
       todoListClaer();
-      listFilter((item) => !item.el.children[0].checked);
+      addedTodoThing.next(INITIAL_STATE());
     }
   );
 
@@ -46,19 +48,6 @@ $on(document, 'DOMContentLoaded', () => {
       let id = e.target.parentElement.getAttribute('id');
       let idx =_.findIndex(stream, (item) => item.id===id);
       removeTodoByIdx(stream, idx);
-    }
-  );
-
-  $delegate(
-    document,
-    '.clear-completed',
-    'click',
-    e => {
-      const stream = addedTodoThing.getValue();
-      _.each(stream, item => {
-        item.el.remove();
-      });
-      addedTodoThing.next([]);
     }
   );
 });
@@ -100,7 +89,7 @@ function genId() {
 }
 
 function loadSavedData() {
-  return [];
+  return INITIAL_STATE();
 }
 
 function init() {
