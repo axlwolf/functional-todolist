@@ -12,6 +12,7 @@ $("DOMContentLoaded", e => {
   const things = new BehaviorSubject([]);
   // 자주쓰는 Element
   const list = qs(".todo-list");
+  const redoThings = () => { things.next(things.getValue()) };
 
   things.subscribe(
     _.pipe(
@@ -24,7 +25,8 @@ $("DOMContentLoaded", e => {
       _.each(item => list.appendChild(item.el))
     )
   );
-  hash.subscribe(() => things.next(things.getValue()));
+  hash.subscribe(redoThings);
+
   $("hashchange", e => {
     const hashPath = location.hash.replace("#/", "");
 
@@ -34,13 +36,18 @@ $("DOMContentLoaded", e => {
   qs(".new-todo").addEventListener("keyup", e => {
     if (e.key === "Enter" && e.target.value !== "") {
         const val = e.target.value;
-
-        e.target.value = "";
-        appendToSubject(things, {
+        const item = {
           thing: val,
           checked: false,
           el: createChild(val)
+        };
+
+        item.el.addEventListener("click", event => {
+          item.checked = event.target.checked;
+          redoThings();
         });
+        e.target.value = "";
+        appendToSubject(things, item);
     }
   });
 });
