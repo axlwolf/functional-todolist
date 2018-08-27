@@ -6,6 +6,17 @@ function appendToSubject(subject, val) {
     return;
 }
 
+function createChild(thing) {
+    const el = document.createElement("li");
+    el.innerHTML =`
+        <input class="toggle" type="checkbox">
+        <label>${thing}</label>
+        <button class="destroy"></button>
+    `;
+    return el;
+}
+
 export {
-    appendToSubject
+    appendToSubject,
+    createChild
 };

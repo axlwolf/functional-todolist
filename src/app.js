@@ -1,6 +1,6 @@
 import * as _ from 'partial-js';
 import { BehaviorSubject } from 'rxjs';
-import { appendToSubject} from './codeSnippet';
+import { appendToSubject, createChild } from './codeSnippet';
 
 const $ = document.addEventListener;
 const qs = document.querySelector.bind(document);
@@ -25,6 +25,7 @@ $("DOMContentLoaded", e => {
         appendToSubject(things, {
           thing: val,
           checked: false,
+          el: createChild(val)
         });
     }
   });
