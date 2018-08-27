@@ -1,6 +1,6 @@
 import * as _ from 'partial-js';
 import { BehaviorSubject } from 'rxjs';
-import { appendToSubject, createChild } from './codeSnippet';
+import { appendToSubject, createChild, FILTER_BASE } from './codeSnippet';
 
 const $ = document.addEventListener;
 const qs = document.querySelector.bind(document);
@@ -10,7 +10,20 @@ $("DOMContentLoaded", e => {
   // 상태정의
   const hash = new BehaviorSubject("");
   const things = new BehaviorSubject([]);
+  // 자주쓰는 Element
+  const list = qs(".todo-list");
 
+  things.subscribe(
+    _.pipe(
+      (val) => {
+        list.innerHTML = "";
+        return val;
+      },
+      _.filter(item => (hash.getValue() === "") ?
+        true : item.checked === FILTER_BASE[hash.getValue()]),
+      _.each(item => list.appendChild(item.el))
+    )
+  );
   $("hashchange", e => {
     const hashPath = location.hash.replace("#/", "");
 

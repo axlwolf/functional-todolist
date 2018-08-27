@@ -16,7 +16,13 @@ function createChild(thing) {
     return el;
 }
 
+const FILTER_BASE = {
+    "active": true,
+    "complete": false
+}
+
 export {
     appendToSubject,
-    createChild
+    createChild,
+    FILTER_BASE
 };
