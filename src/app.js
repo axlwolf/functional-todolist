@@ -15,7 +15,7 @@ $("DOMContentLoaded", e => {
 
   things.subscribe(
     _.pipe(
-      (val) => {
+      val => {
         list.innerHTML = "";
         return val;
       },
@@ -24,6 +24,7 @@ $("DOMContentLoaded", e => {
       _.each(item => list.appendChild(item.el))
     )
   );
+  hash.subscribe(() => things.next(things.getValue()));
   $("hashchange", e => {
     const hashPath = location.hash.replace("#/", "");
 

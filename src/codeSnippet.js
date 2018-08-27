@@ -17,8 +17,8 @@ function createChild(thing) {
 }
 
 const FILTER_BASE = {
-    "active": true,
-    "complete": false
+    "active": false,
+    "completed": true
 }
 
 export {
