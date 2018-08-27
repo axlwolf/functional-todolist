@@ -32,7 +32,7 @@ $("DOMContentLoaded", e => {
   });
 
   qs(".new-todo").addEventListener("keyup", e => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && e.target.value !== "") {
         const val = e.target.value;
 
         e.target.value = "";
