@@ -55,7 +55,6 @@ $("DOMContentLoaded", e => {
       appendToSubject(things, item);
     });
 
-  qs(".clear-completed").addEventListener("click", e => {
-    things.next([]);
-  });
+  const sClearBtn = fromEvent(qs(".clear-completed"), "click")
+    .subscribe(things.next.bind(things, []));
 });
