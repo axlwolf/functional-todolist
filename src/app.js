@@ -7,13 +7,15 @@ const qs = document.querySelector.bind(document);
 
 $("DOMContentLoaded", e => {
   console.log("DOMLoaded");
-  // 상태정의
+  // 상태정의, CELL 개념
   const hash = new BehaviorSubject("");
   const things = new BehaviorSubject([]);
+  const viewList = new BehaviorSubject([]);
   // 자주쓰는 Element
   const list = qs(".todo-list");
   const redoThings = () => { things.next(things.getValue()) };
 
+  viewList.subscribe(_.each(item => list.appendChild(item.el)));
   things.subscribe(
     _.pipe(
       val => {
@@ -22,7 +24,7 @@ $("DOMContentLoaded", e => {
       },
       _.filter(item => (hash.getValue() === "") ?
         true : item.checked === FILTER_BASE[hash.getValue()]),
-      _.each(item => list.appendChild(item.el))
+        viewList.next.bind(viewList)
     )
   );
   hash.subscribe(redoThings);
