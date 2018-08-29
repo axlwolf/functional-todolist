@@ -1,5 +1,6 @@
 import * as _ from 'partial-js';
-import { BehaviorSubject, Observable, observable, fromEvent } from 'rxjs';
+import { BehaviorSubject, fromEvent } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { appendToSubject, createChild, FILTER_BASE } from './codeSnippet';
 
 const $ = document.addEventListener;
@@ -13,7 +14,7 @@ $("DOMContentLoaded", e => {
   const viewList = new BehaviorSubject([]);
   // 자주쓰는 Element
   const list = qs(".todo-list");
-  const redoThings = () => { things.next(things.getValue()) };
+  const execThingsSubscribe = () => { things.next(things.getValue()) };
 
   viewList.subscribe(_.each(item => list.appendChild(item.el)));
   things.subscribe(
@@ -27,7 +28,7 @@ $("DOMContentLoaded", e => {
         viewList.next.bind(viewList)
     )
   );
-  hash.subscribe(redoThings);
+  hash.subscribe(execThingsSubscribe);
 
   const sChangeHash = fromEvent(window, "hashchange").subscribe(
     () => {
@@ -36,24 +37,24 @@ $("DOMContentLoaded", e => {
       hash.next(hashPath);
     }
   );
+  const sInput = fromEvent(qs(".new-todo"), "keyup")
+    .pipe(filter(e => e.key === "Enter" && e.target.value !== ""))
+    .subscribe(e => {
+      const val = e.target.value;
+      const item = {
+        thing: val,
+        checked: false,
+        el: createChild(val)
+      };
 
-  qs(".new-todo").addEventListener("keyup", e => {
-    if (e.key === "Enter" && e.target.value !== "") {
-        const val = e.target.value;
-        const item = {
-          thing: val,
-          checked: false,
-          el: createChild(val)
-        };
+      item.el.addEventListener("click", event => {
+        item.checked = event.target.checked;
+        execThingsSubscribe();
+      });
+      e.target.value = "";
+      appendToSubject(things, item);
+    });
 
-        item.el.addEventListener("click", event => {
-          item.checked = event.target.checked;
-          redoThings();
-        });
-        e.target.value = "";
-        appendToSubject(things, item);
-    }
-  });
   qs(".clear-completed").addEventListener("click", e => {
     things.next([]);
   });
