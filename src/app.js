@@ -1,5 +1,5 @@
 import * as _ from 'partial-js';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, observable, fromEvent } from 'rxjs';
 import { appendToSubject, createChild, FILTER_BASE } from './codeSnippet';
 
 const $ = document.addEventListener;
@@ -29,11 +29,13 @@ $("DOMContentLoaded", e => {
   );
   hash.subscribe(redoThings);
 
-  $("hashchange", e => {
-    const hashPath = location.hash.replace("#/", "");
+  const sChangeHash = fromEvent(window, "hashchange").subscribe(
+    () => {
+      const hashPath = location.hash.replace("#/", "");
 
-    hash.next(hashPath);
-  });
+      hash.next(hashPath);
+    }
+  );
 
   qs(".new-todo").addEventListener("keyup", e => {
     if (e.key === "Enter" && e.target.value !== "") {
